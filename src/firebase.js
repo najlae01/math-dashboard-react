@@ -17,10 +17,6 @@ const firebaseConfig = {
 };
 
 
-console.log("API Key:", import.meta.env.VITE_FIREBASE_API_KEY);
-console.log("Auth Domain:", import.meta.env.VITE_FIREBASE_AUTH_DOMAIN);
-
-
 // Initialize Firebase
 export const app = initializeApp(firebaseConfig);
 
