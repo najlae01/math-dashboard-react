@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { getDatabase, ref, get } from "firebase/database"; 
-import { app } from "../firebase";
+import { getDatabase, ref as dbRef, query, orderByChild, equalTo, get, update } from "firebase/database";
+import { app } from "../firebase"; 
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-const StudentTable = () => {
+const StudentTable = ({ onFoundPlayer, teacherUID }) => {
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const navigate = useNavigate();
+
+    const [error, setError] = useState("");
+
     // Firebase Realtime Database reference
     const db = getDatabase(app);
-    const studentsRef = ref(db, "players");
+    const studentsRef = dbRef(db, "players");
 
     // Fetching student data from Realtime Database
     useEffect(() => {
@@ -18,13 +23,22 @@ const StudentTable = () => {
                 const snapshot = await get(studentsRef);
                 if (snapshot.exists()) {
                     const studentData = snapshot.val();
-                    const studentList = Object.keys(studentData).map((key) => ({
-                        id: key,
-                        ...studentData[key],
-                    }));
+                    const studentList = Object.keys(studentData)
+                        .map((key) => ({
+                            id: key,
+                            ...studentData[key],
+                        }))
+                        .filter(
+                            (student) =>
+                                student.is_authenticated_by_teacher === true &&
+                                // student.linked_teacher_id === teacherUID 
+                                student.linked_teacher_id === "tempTeacherID" // using the "tempTeacherID" for now
+                        ); 
+                    
                     setStudents(studentList);
                 } else {
                     console.log("No student data found.");
+                    setStudents([]);
                 }
             } catch (error) {
                 console.error("Error fetching student data: ", error);
@@ -32,28 +46,67 @@ const StudentTable = () => {
                 setLoading(false);
             }
         };
-
+    
         fetchStudents();
-    }, []);
+    }, [teacherUID]);
+    
 
     if (loading) {
         return <div>Loading students...</div>;
     }
 
-    // Handle Edit and Delete (example placeholders)
-    const handleEdit = (id) => {
-        // Implement edit logic here
-        console.log("Editing student with ID: ", id);
+    const handleEdit = async (playerName) => {
+        console.log("Editing student with playerName:", playerName);
+        try {
+            const playerQuery = query(studentsRef, orderByChild("player_name"), equalTo(playerName));
+            const snapshot = await get(playerQuery);
+            
+            if (snapshot.exists()) {
+                const playerData = snapshot.val();
+                const playerUID = Object.keys(playerData)[0];
+                onFoundPlayer(playerData[playerUID], playerUID);
+                navigate("/register-student", {
+                    state: {
+                        playerData: playerData[playerUID],
+                        playerUID,
+                        teacherUID
+                    },
+                });
+            } else {
+                setError("Player not found.");
+            }
+        } catch (err) {
+            console.error("Error fetching player data:", err);
+            setError("An error occurred while searching.");
+        }
     };
 
-    const handleDelete = (id) => {
-        // Implement delete logic here
-        console.log("Deleting student with ID: ", id);
+    const handleDelete = async (playerName) => {
+        try {
+            const playerQuery = query(studentsRef, orderByChild("player_name"), equalTo(playerName));
+            const snapshot = await get(playerQuery);
+            
+            if (snapshot.exists()) {
+                const playerData = snapshot.val();
+                const playerUID = Object.keys(playerData)[0];
+                const playerRef = dbRef(db, `players/${playerUID}`);  
+                await update(playerRef, {
+                    is_authenticated_by_teacher: false,
+                    linked_teacher_id: null,  
+                });
+            } else {
+                setError("Player not found.");
+            }
+        } catch (err) {
+            console.error("Error fetching player data:", err);
+            setError("An error occurred while searching.");
+        }
+        console.log("Deleting student with ID: ", playerName);
     };
 
-    const handleInfos = (id) => {
+    const handleInfos = (playerName) => {
         // Implement delete logic here
-        console.log("See more about the student: ", id);
+        console.log("See more about the student: ", playerName);
     };
 
     return (
@@ -74,7 +127,7 @@ const StudentTable = () => {
                     </thead>
                     <tbody>
                         {students.map((student) => (
-                            <tr key={student.id}>
+                            <tr key={student.player_name}>
                                 <td>{student.first_name}</td>
                                 <td>{student.last_name}</td>
                                 <td>
@@ -98,7 +151,7 @@ const StudentTable = () => {
                                 </td>
                                 <td className="actions">
                                     <button
-                                        onClick={() => handleEdit(student.id)}
+                                        onClick={() => handleEdit(student.player_name)}
                                         className="icon-button"
                                     >
                                         <i className="fas fa-edit"></i>
@@ -106,18 +159,18 @@ const StudentTable = () => {
                                     
                                     {/* Deleting will result on remove the student from the learning analytics analysis (it shouldn't delete the player account or any of the data related to the game only) */}
                                     <button
-                                        onClick={() => handleDelete(student.id)}
+                                        onClick={() => handleDelete(student.player_name)}
                                         className="icon-button"
                                     >
                                         <i className="fas fa-trash"></i>
                                     </button>
                                     
-                                    <button
-                                        onClick={() => handleInfos(student.id)}
+                                    {/* <button
+                                        onClick={() => handleInfos(student.player_name)}
                                         className="icon-button"
                                     >
                                         <i className="fas fa-info-circle"></i>
-                                    </button>
+                                    </button> */}
                                 </td>
                             </tr>
                         ))}

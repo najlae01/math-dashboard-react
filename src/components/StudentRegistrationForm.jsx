@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { db, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getDatabase, ref as dbRef, update } from "firebase/database";
-import { app } from "../firebase"; 
+import { app } from "../firebase";  
 
 const StudentRegistrationForm = ({ playerData, playerUID, teacherUID }) => {
   const [formData, setFormData] = useState({
@@ -17,6 +17,26 @@ const StudentRegistrationForm = ({ playerData, playerUID, teacherUID }) => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+ 
+
+  useEffect(() => {
+    if (playerData) {
+        setFormData({
+            firstName: playerData.first_name || "",
+            lastName: playerData.last_name || "",
+            birthday: playerData.birthday ? new Date(playerData.birthday).toISOString().split("T")[0] : "",
+            grade: playerData.school_grade || 1,
+            gender: playerData.gender || "",
+            photo: null,
+            IsAuthenticatedByTeacher: playerData.is_authenticated_by_teacher || false,
+            LinkedTeacherID: playerData.linked_teacher_id || "",
+        });
+      }
+      else
+      {
+        console.error("Error: playerData is undefined, preventing update.");
+      }
+  }, [playerData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,20 +51,18 @@ const StudentRegistrationForm = ({ playerData, playerUID, teacherUID }) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const studentId = `${formData.firstName}-${formData.lastName}-${Date.now()}`;
-
     try {
-        let photoURL = "";
+        let photoURL = formData.photo_url || ""; // Preserve existing photo URL if no new photo is uploaded
         if (formData.photo) {
-            const storageRef = ref(storage, `students/${studentId}/${formData.photo.name}`);
+            const storageRef = ref(storage, `students/${playerUID || `${formData.firstName}-${formData.lastName}-${Date.now()}`}/${formData.photo.name}`);
             await uploadBytes(storageRef, formData.photo);
             photoURL = await getDownloadURL(storageRef);
         }
 
         const db = getDatabase(app);
-        const playerRef = dbRef(db, `players/${playerUID}`);
+        const playerRef = dbRef(db, `players/${playerUID}`); // Use playerUID for updates
 
-        // Update only the provided fields
+        // Update or create the player
         await update(playerRef, {
             first_name: formData.firstName,
             last_name: formData.lastName,
@@ -52,28 +70,32 @@ const StudentRegistrationForm = ({ playerData, playerUID, teacherUID }) => {
             school_grade: formData.grade,
             gender: formData.gender,
             photo_url: photoURL,
-            Is_authenticated_by_teacher: true,
-            linked_teacher_id: "tempTeacherID",
+            is_authenticated_by_teacher: true,
+            linked_teacher_id: teacherUID || "tempTeacherID", // Use the actual teacherUID
         });
 
-        alert("Student registered successfully!");
-        setFormData({
-            firstName: "",
-            lastName: "",
-            birthday: "",
-            grade: "",
-            gender: "",
-            photo: null,
-            IsAuthenticatedByTeacher: false,
-            LinkedTeacherID: "",
-        });
-        } catch (error) {
-        console.error("Error registering student:", error);
-        alert("Failed to register student.");
-        } finally {
+        alert(playerUID ? "Student updated successfully!" : "Student registered successfully!");
+        if (!playerUID) {
+          console.error("Error: playerUID is undefined, preventing update.");
+            // Reset form only for new registrations
+            setFormData({
+                firstName: "",
+                lastName: "",
+                birthday: "",
+                grade: "",
+                gender: "",
+                photo: null,
+                IsAuthenticatedByTeacher: false,
+                LinkedTeacherID: "",
+            });
+        } 
+    } catch (error) {
+        console.error("Error registering/updating student:", error);
+        alert("Failed to register/update student.");
+    } finally {
         setIsSubmitting(false);
-        }
-    };
+    }
+  };
 
     // Convert birthday string to a Date object
     const parseDate = (dateString) => {
@@ -82,7 +104,7 @@ const StudentRegistrationForm = ({ playerData, playerUID, teacherUID }) => {
 
   return (
     <div className="student-registration-form">
-      <h2>Register a New Student</h2>
+      <h2>{playerUID ? "Edit Student" : "Register a New Student"}</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>First Name</label>
@@ -129,8 +151,8 @@ const StudentRegistrationForm = ({ playerData, playerUID, teacherUID }) => {
             <option value="1">Grade 1</option>
             <option value="2">Grade 2</option>
             <option value="3">Grade 3</option>
-            <option value="4">Grade 1</option>
-            <option value="5">Grade 2</option>
+            <option value="4">Grade 4</option>
+            <option value="5">Grade 5</option>
             <option value="6">Grade 6</option>
           </select>
         </div>
@@ -155,7 +177,7 @@ const StudentRegistrationForm = ({ playerData, playerUID, teacherUID }) => {
         </div>
 
         <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Register Student"}
+            {isSubmitting ? "Submitting..." : playerUID ? "Update Student" : "Register Student"}
         </button>
       </form>
     </div>

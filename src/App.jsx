@@ -24,15 +24,16 @@ function App() {
           <h1>Welcome to Mathoria Teacher Dashboard</h1>
           <Routes>
             {/* Route for the StudentTable (default route) */}
-            <Route path="/" element={<StudentTable />} />
+            <Route path="/" element={<StudentTable onFoundPlayer={handleFoundPlayer} teacherUID={teacherUID}/>} />
 
             {/* Route for the Student Registration Form */}
             <Route path="/search-student"
               element={<TeacherDashboard teacherUID={teacherUID} />}
             />
-            <Route path="/register-student" element={<StudentRegistrationForm           
+            <Route path="/register-student" element={<StudentRegistrationForm          
               playerData={studentData}
-              playerUID={studentUID} />} 
+              playerUID={studentUID}
+              teacherUID={teacherUID} />} 
               />
           </Routes>
         </header>

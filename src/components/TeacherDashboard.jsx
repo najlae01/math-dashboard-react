@@ -15,7 +15,7 @@ const TeacherDashboard = ({ teacherUID }) => {
     <div>
       <h1>Teacher Dashboard</h1>
       {!studentData ? (
-        <SearchStudentForm onFoundPlayer={handleFoundPlayer} />
+        <SearchStudentForm onFoundPlayer={handleFoundPlayer}  />
       ) : (
         <StudentRegistrationForm
           playerData={studentData}

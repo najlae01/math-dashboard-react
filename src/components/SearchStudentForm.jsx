@@ -23,6 +23,7 @@ const SearchStudentForm = ({ onFoundPlayer }) => {
             state: {
               playerData: playerData[playerUID],
               playerUID,
+              teacherUID
             },
           });
       } else {
