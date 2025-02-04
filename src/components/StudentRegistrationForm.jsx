@@ -4,7 +4,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getDatabase, ref as dbRef, update } from "firebase/database";
 import { app } from "../firebase"; 
 
-const StudentRegistrationForm = ({ playerData, playerUID }) => {
+const StudentRegistrationForm = ({ playerData, playerUID, teacherUID }) => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -46,14 +46,14 @@ const StudentRegistrationForm = ({ playerData, playerUID }) => {
 
         // Update only the provided fields
         await update(playerRef, {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
             birthday: parseDate(formData.birthday),
-            grade: formData.grade,
+            school_grade: formData.grade,
             gender: formData.gender,
-            photoURL: photoURL,
-            IsAuthenticatedByTeacher: true,
-            LinkedTeacherID: "tempTeacherID",
+            photo_url: photoURL,
+            Is_authenticated_by_teacher: true,
+            linked_teacher_id: "tempTeacherID",
         });
 
         alert("Student registered successfully!");
@@ -126,9 +126,12 @@ const StudentRegistrationForm = ({ playerData, playerUID }) => {
             required
           >
             <option value="">Select Grade</option>
-            <option value="Grade 1">Grade 1</option>
-            <option value="Grade 2">Grade 2</option>
-            <option value="Grade 3">Grade 3</option>
+            <option value="1">Grade 1</option>
+            <option value="2">Grade 2</option>
+            <option value="3">Grade 3</option>
+            <option value="4">Grade 1</option>
+            <option value="5">Grade 2</option>
+            <option value="6">Grade 6</option>
           </select>
         </div>
 

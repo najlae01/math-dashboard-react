@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import SearchStudentForm from "./SearchStudentForm";
-import UpdateStudentForm from "./UpdateStudentForm";
+import StudentRegistrationForm from "./StudentRegistrationForm";
 
-const TeacherDashboard = ({ teacherID }) => {
+const TeacherDashboard = ({ teacherUID }) => {
   const [studentData, setStudentData] = useState(null);
   const [studentUID, setStudentUID] = useState(null);
 
@@ -17,10 +17,10 @@ const TeacherDashboard = ({ teacherID }) => {
       {!studentData ? (
         <SearchStudentForm onFoundPlayer={handleFoundPlayer} />
       ) : (
-        <UpdateStudentForm
+        <StudentRegistrationForm
           playerData={studentData}
           playerUID={studentUID}
-          teacherID={teacherID}
+          teacherUID={teacherUID}
         />
       )}
     </div>

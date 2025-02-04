@@ -3,11 +3,13 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 import StudentTable from './components/StudentTable'
 import StudentRegistrationForm from './components/StudentRegistrationForm';
-import SearchStudentForm from './components/SearchStudentForm';
+import TeacherDashboard from './components/TeacherDashboard';
 
 function App() {
   const [studentData, setStudentData] = useState(null);
   const [studentUID, setStudentUID] = useState(null);
+
+  const [teacherUID, setTeacherUID] = useState(null);
 
   const handleFoundPlayer = (playerData, playerUID) => {
     setStudentData(playerData);
@@ -26,7 +28,7 @@ function App() {
 
             {/* Route for the Student Registration Form */}
             <Route path="/search-student"
-              element={<SearchStudentForm onFoundPlayer={handleFoundPlayer} />}
+              element={<TeacherDashboard teacherUID={teacherUID} />}
             />
             <Route path="/register-student" element={<StudentRegistrationForm           
               playerData={studentData}

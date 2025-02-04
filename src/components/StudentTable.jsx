@@ -75,20 +75,20 @@ const StudentTable = () => {
                     <tbody>
                         {students.map((student) => (
                             <tr key={student.id}>
-                                <td>{student.firstName}</td>
-                                <td>{student.lastName}</td>
+                                <td>{student.first_name}</td>
+                                <td>{student.last_name}</td>
                                 <td>
                                     {student.birthday
                                     ? new Date(student.birthday).toISOString().split("T")[0]
                                     : "N/A"}
                                 </td>
-                                <td>{student.grade}</td>
+                                <td>{student.school_grade}</td>
                                 <td>{student.gender}</td>
                                 <td>
-                                    {student.photoURL ? (
+                                    {student.photo_url ? (
                                         <img
-                                            src={student.photoURL}
-                                            alt={`${student.firstName} ${student.lastName}`}
+                                            src={student.photo_url}
+                                            alt={`${student.first_name} ${student.last_name}`}
                                             width="50"
                                             height="50"
                                         />
@@ -103,12 +103,15 @@ const StudentTable = () => {
                                     >
                                         <i className="fas fa-edit"></i>
                                     </button>
+                                    
+                                    {/* Deleting will result on remove the student from the learning analytics analysis (it shouldn't delete the player account or any of the data related to the game only) */}
                                     <button
                                         onClick={() => handleDelete(student.id)}
                                         className="icon-button"
                                     >
                                         <i className="fas fa-trash"></i>
                                     </button>
+                                    
                                     <button
                                         onClick={() => handleInfos(student.id)}
                                         className="icon-button"
