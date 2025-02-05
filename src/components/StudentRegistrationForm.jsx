@@ -67,7 +67,7 @@ const StudentRegistrationForm = ({ playerData, playerUID, teacherUID }) => {
             first_name: formData.firstName,
             last_name: formData.lastName,
             birthday: parseDate(formData.birthday),
-            school_grade: formData.grade,
+            school_grade: convertToInt(formData.grade),
             gender: formData.gender,
             photo_url: photoURL,
             is_authenticated_by_teacher: true,
@@ -100,7 +100,11 @@ const StudentRegistrationForm = ({ playerData, playerUID, teacherUID }) => {
     // Convert birthday string to a Date object
     const parseDate = (dateString) => {
         return new Date(dateString); // Convert the string to a Date object
-      };
+    };
+
+    const convertToInt = (schoolGradeString) => {
+      return parseInt(schoolGradeString);
+    };
 
   return (
     <div className="student-registration-form">
