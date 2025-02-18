@@ -1,28 +1,13 @@
 import React, { useState } from "react";
-import SearchStudentForm from "./SearchStudentForm";
-import StudentRegistrationForm from "./StudentRegistrationForm";
+import StudentCreationForm from "./StudentCreationForm";
 
 const TeacherDashboard = ({ teacherUID }) => {
-  const [studentData, setStudentData] = useState(null);
-  const [studentUID, setStudentUID] = useState(null);
-
-  const handleFoundPlayer = (playerData, playerUID) => {
-    setStudentData(playerData);
-    setStudentUID(playerUID);
-  };
-
   return (
     <div>
       <h1>Teacher Dashboard</h1>
-      {!studentData ? (
-        <SearchStudentForm onFoundPlayer={handleFoundPlayer}  />
-      ) : (
-        <StudentRegistrationForm
-          playerData={studentData}
-          playerUID={studentUID}
+        <StudentCreationForm
           teacherUID={teacherUID}
         />
-      )}
     </div>
   );
 };

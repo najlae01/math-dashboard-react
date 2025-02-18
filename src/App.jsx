@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 import StudentTable from './components/StudentTable'
-import StudentRegistrationForm from './components/StudentRegistrationForm';
 import TeacherDashboard from './components/TeacherDashboard';
 
 function App() {
@@ -27,14 +26,9 @@ function App() {
             <Route path="/" element={<StudentTable onFoundPlayer={handleFoundPlayer} teacherUID={teacherUID}/>} />
 
             {/* Route for the Student Registration Form */}
-            <Route path="/search-student"
+            <Route path="/register-student"
               element={<TeacherDashboard teacherUID={teacherUID} />}
             />
-            <Route path="/register-student" element={<StudentRegistrationForm          
-              playerData={studentData}
-              playerUID={studentUID}
-              teacherUID={teacherUID} />} 
-              />
           </Routes>
         </header>
       </div>
