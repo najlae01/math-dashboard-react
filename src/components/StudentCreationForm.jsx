@@ -10,7 +10,6 @@ const StudentCreationForm = ({ teacherUID }) => {
     firstName: "",
     lastName: "",
     email: "",
-    password: "", 
     birthday: "",
     grade: "",
     gender: "",
@@ -31,7 +30,7 @@ const StudentCreationForm = ({ teacherUID }) => {
     setIsSubmitting(true);
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, "password");
       const studentUID = userCredential.user.uid;
 
       const db = getDatabase();
@@ -65,7 +64,6 @@ const StudentCreationForm = ({ teacherUID }) => {
               firstName: "",
               lastName: "",
               email: "",
-              password: "", 
               birthday: "",
               grade: "",
               gender: "",
@@ -169,17 +167,6 @@ const StudentCreationForm = ({ teacherUID }) => {
             name="email" 
             placeholder="Email" 
             value={formData.email}
-            onChange={handleChange} 
-            required />        
-        </div>
-
-        <div className="form-group">
-          <label>Password</label>
-          <input 
-            type="password" 
-            name="password" 
-            placeholder="Password" 
-            value={formData.password} 
             onChange={handleChange} 
             required />        
         </div>
