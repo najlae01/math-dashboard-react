@@ -49,14 +49,14 @@ const StudentCreationForm = ({ teacherUID }) => {
             uid: studentUID,
         });
 
-        // Create a login URL with the student UID
-        const loginURL = `${window.location.origin}/game-login?uid=${studentUID}`;
+        //  Generate the QR code text with the student UID
+        const codeText = `${studentUID}`;
 
-        // Set the QR code URL for rendering the QR code
-        setQrCodeURL(loginURL);
+        // Set the QR code Text for rendering the QR code
+        setQrCodeURL(codeText);
 
         // Generate the PDF with the QR code
-        generatePDF(loginURL);
+        generatePDF(codeText);
 
         alert("Student registered successfully!");
 
@@ -71,12 +71,18 @@ const StudentCreationForm = ({ teacherUID }) => {
               gender: "",
               LinkedTeacherID: "",
           });
-    } catch (error) {
-        console.error("Error registering student:", error);
-        alert("Failed to register student.");
-    } finally {
-        setIsSubmitting(false);
-    }
+          
+      } catch (error) {
+          console.error("Error registering student:", error.message);
+  
+          if (error.code === "auth/email-already-in-use") {
+              alert("This email is already registered. Try logging in instead.");
+          } else {
+              alert("Failed to register student. Please try again.");
+          }
+      } finally {
+          setIsSubmitting(false);
+      }
   };
 
     // Convert birthday string to a Date object
@@ -91,8 +97,8 @@ const StudentCreationForm = ({ teacherUID }) => {
 
     
      // Function to generate the PDF
-     const generatePDF = (loginURL) => {
-        QRCode.toDataURL(loginURL, (err, url) => {
+     const generatePDF = (codeText) => {
+        QRCode.toDataURL(codeText, (err, url) => {
           if (err) {
             console.error("Erreur lors de la génération du QR code:", err);
             return;
