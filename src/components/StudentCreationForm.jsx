@@ -13,7 +13,7 @@ const StudentCreationForm = ({ teacherUID }) => {
     birthday: "",
     grade: "",
     gender: "",
-    LinkedTeacherID: "",
+    linkedTeacherId: "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,18 +34,19 @@ const StudentCreationForm = ({ teacherUID }) => {
       const studentUID = userCredential.user.uid;
 
       const db = getDatabase();
-      const studentRef = ref(db, 'players/' + studentUID);
+      const studentRef = ref(db, 'users/' + studentUID);
 
         // create the player
         set(studentRef, {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
             email: formData.email,
             birthday: parseDate(formData.birthday),
-            school_grade: convertToInt(formData.grade),
+            schoolGrade: convertToInt(formData.grade),
             gender: formData.gender,
-            linked_teacher_id: teacherUID || "tempTeacherID", // Use the actual teacherUID
+            linkedTeacherId: teacherUID || "tempTeacherID", // Use the actual teacherUID
             uid: studentUID,
+            role: "Student"
         });
 
         //  Generate the QR code text with the student UID
@@ -67,7 +68,7 @@ const StudentCreationForm = ({ teacherUID }) => {
               birthday: "",
               grade: "",
               gender: "",
-              LinkedTeacherID: "",
+              linkedTeacherId: "",
           });
           
       } catch (error) {

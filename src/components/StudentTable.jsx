@@ -14,7 +14,7 @@ const StudentTable = ({ onFoundPlayer, teacherUID }) => {
 
     // Firebase Realtime Database reference
     const db = getDatabase(app);
-    const studentsRef = dbRef(db, "players");
+    const studentsRef = dbRef(db, "users");
 
     // Fetching student data from Realtime Database
     useEffect(() => {
@@ -30,7 +30,7 @@ const StudentTable = ({ onFoundPlayer, teacherUID }) => {
                         }))
                         .filter(
                             (student) =>
-                                student.linked_teacher_id === "tempTeacherID" // using the "tempTeacherID" for now
+                                student.linkedTeacherId === "tempTeacherID" // using the "tempTeacherID" for now
                         ); 
                     
                     setStudents(studentList);
@@ -56,9 +56,9 @@ const StudentTable = ({ onFoundPlayer, teacherUID }) => {
 
     const handleDelete = async (uid) => {
         try {
-            const playerRef = dbRef(db, `players/${uid}`);  
+            const playerRef = dbRef(db, `users/${uid}`);  
             await update(playerRef, {
-                linked_teacher_id: null,  
+                linkedTeacherId: null,  
             });
         } catch (err) {
             console.error("Error fetching player data:", err);
@@ -87,14 +87,14 @@ const StudentTable = ({ onFoundPlayer, teacherUID }) => {
                     <tbody>
                         {students.map((student) => (
                             <tr key={student.uid}>
-                                <td>{student.first_name}</td>
-                                <td>{student.last_name}</td>
+                                <td>{student.firstName}</td>
+                                <td>{student.lastName}</td>
                                 <td>
                                     {student.birthday
                                     ? new Date(student.birthday).toISOString().split("T")[0]
                                     : "N/A"}
                                 </td>
-                                <td>{student.school_grade}</td>
+                                <td>{student.schoolGrade}</td>
                                 <td>{student.gender}</td>
 
                                 <td className="actions">  
